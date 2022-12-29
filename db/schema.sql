@@ -8,7 +8,7 @@ CREATE TABLE department(
 
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 
-    name VARCHAR(30)
+    name VARCHAR(30) UNIQUE NOT NULL
 );
 
 -- role table
@@ -16,11 +16,12 @@ CREATE TABLE role(
 
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 
-    title VARCHAR(30),
+    title VARCHAR(30) UNIQUE NOT NULL,
 
-    salary DECIMAL,
+    salary DECIMAL UNIQUE NOT NULL,
 
-    department_id INT
+    department_id INT UNSIGNED NOT NULL,
+    
 
 );
 -- employee table
