@@ -2,7 +2,7 @@
 const mysql = require("mysql2");
 // Import inquirer
 const inquirer = require("inquirer");
-
+const table = require("console.table");
 // create the connection to database
 const db = mysql.createConnection(
   {
@@ -231,7 +231,7 @@ function mainQuestionFunction() {
         );
         console.log(newEmployee);
         console.log(
-          `Added ${answers.firstName} ${answers.lastName} to the table`
+          `Added ${answers.firstName} ${answers.lastName} to the database`
         );
         mainQuestionFunction();
       });
@@ -246,13 +246,13 @@ function mainQuestionFunction() {
         newRole.push(newRoleInput);
 
         db.query(
-          `INSERT INTO role(tile, salary, department_id) VALUES ("${roleInputName}","${roleInputSalary}", "${roleInputDepartment}")`,
+          `INSERT INTO role(tile, salary, department_id) VALUES ("${roleInputName}","${roleInputSalary}", ${roleInputDepartment})`,
           function (err, results) {
             if (err) throw err;
           }
         );
         console.log(newRole);
-        console.log(`Added ${answers.roleName}to the table`);
+        console.log(`Added ${answers.roleName}to the database`);
         mainQuestionFunction();
       });
     } else if (answers.choice === "Add Department") {
@@ -278,7 +278,7 @@ function mainQuestionFunction() {
         newUpdate.push(updateInput);
 
         db.query(
-          `INSERT INTO department(name) VALUES ("${departmentInput}")`,
+          `INSERT INTO department(name) VALUES ("${updateInput}")`,
           function (err, results) {
             if (err) throw err;
           }
@@ -288,9 +288,7 @@ function mainQuestionFunction() {
         mainQuestionFunction();
       });
     } else if (answers.choice === "Quit") {
-      return;
-    } else {
-      return "Exiting Application";
+      return mainQuestionFunction();
     }
   });
 }
