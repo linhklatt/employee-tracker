@@ -213,48 +213,68 @@ function mainQuestionFunction() {
     } else if (answers.choice === "View All Departments") {
       viewAllDepartments();
     } else if (answers.choice === "Add Employee") {
-      inquirer.prompt(employeeQuestions).then((answers) => {
-        let employeeInputFirstName = [`${answers.firstName}`];
-        let employeeInputLastName = [`${answers.lastName}`];
-        let employeeInputRole = [`${answers.role}`];
-        let employeeInputManager = [`${answers.manager}`];
-        let newEmployeeInput = [
-          `${employeeInputFirstName},${employeeInputLastName},${employeeInputRole},${employeeInputManager}`,
-        ];
-        newEmployee.push(newEmployeeInput);
+      db.query(
+        "Select title as name, id as value from role ",
+        function (err, role_data) {
+          db.query(
+            "select concat(first_name,' ',last_name) as name, id as value from employee ",
+            function (err, employee_data) {
+              employeeQuestions[2].choices = role_data;
+              employeeQuestions[3].choices = employee_data;
+              inquirer.prompt(employeeQuestions).then((answers) => {
+                let employeeInputFirstName = [`${answers.firstName}`];
+                let employeeInputLastName = [`${answers.lastName}`];
+                let employeeInputRole = [`${answers.role}`];
+                let employeeInputManager = [`${answers.manager}`];
+                let newEmployeeInput = [
+                  `${employeeInputFirstName},${employeeInputLastName},${employeeInputRole},${employeeInputManager}`,
+                ];
+                newEmployee.push(newEmployeeInput);
 
-        db.query(
-          `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("${answers.firstName}","${answers.lastName}", 1,null)`,
-          function (err, results) {
-            if (err) throw err;
-          }
-        );
-        console.log(newEmployee);
-        console.log(
-          `Added ${answers.firstName} ${answers.lastName} to the database`
-        );
-        mainQuestionFunction();
-      });
+                db.query(
+                  `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("${answers.firstName}","${answers.lastName}", 1,null)`,
+                  function (err, results) {
+                    if (err) throw err;
+                  }
+                );
+                console.log(newEmployee);
+                console.log(
+                  `Added ${answers.firstName} ${answers.lastName} to the database`
+                );
+                mainQuestionFunction();
+              });
+            }
+          );
+        }
+      );
     } else if (answers.choice === "Add Role") {
-      inquirer.prompt(roleQuestions).then((answers) => {
-        let roleInputName = [`${answers.roleName}`];
-        let roleInputSalary = [`${answers.roleSalary}`];
-        let roleInputDepartment = [`${answers.roleDepartment}`];
-        let newRoleInput = [
-          `${answers.roleName},${answers.roleSalary},${answers.roleDepartment}`,
-        ];
-        newRole.push(newRoleInput);
-
-        db.query(
-          `INSERT INTO role(tile, salary, department_id) VALUES ("${roleInputName}","${roleInputSalary}", ${roleInputDepartment})`,
-          function (err, results) {
-            if (err) throw err;
-          }
-        );
-        console.log(newRole);
-        console.log(`Added ${answers.roleName}to the database`);
-        mainQuestionFunction();
-      });
+      db.query(
+        "SELECT name, id AS value from department ",
+        function (err, department_data) {
+          roleQuestions[2].choices = department_data;
+          inquirer.prompt(roleQuestions).then((answers) => {
+            let roleInputName = [`${answers.roleName}`];
+            let roleInputSalary = [`${answers.roleSalary}`];
+            let roleInputDepartment = [`${answers.roleDepartment}`];
+            let newRoleInput = [
+              `${answers.roleName},${answers.roleSalary},${answers.roleDepartment}`,
+            ];
+            newRole.push(newRoleInput);
+            console.log(
+              `INSERT INTO role(tile, salary, department_id) VALUES ("${roleInputName}","${roleInputSalary}", ${roleInputDepartment})`
+            );
+            db.query(
+              `INSERT INTO role(tile, salary, department_id) VALUES ("${roleInputName}","${roleInputSalary}", ${roleInputDepartment})`,
+              function (err, results) {
+                if (err) throw err;
+              }
+            );
+            console.log(newRole);
+            console.log(`Added ${answers.roleName}to the database`);
+            mainQuestionFunction();
+          });
+        }
+      );
     } else if (answers.choice === "Add Department") {
       inquirer.prompt(departmentQuestions).then((answers) => {
         let departmentInput = [`${answers.departmentName}`];
@@ -288,7 +308,7 @@ function mainQuestionFunction() {
         mainQuestionFunction();
       });
     } else if (answers.choice === "Quit") {
-      return mainQuestionFunction();
+      return;
     }
   });
 }
